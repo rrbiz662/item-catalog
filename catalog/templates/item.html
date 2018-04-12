@@ -1,0 +1,15 @@
+{% extends "index.html" %}
+{% block body%}
+{% include "header.html" %}
+
+<!--List categories.-->
+<div>
+        <h2>Item</h2>
+        {{item.name}}
+        <br>
+        {{item.description}}
+        <br>
+        {{item.date_created}}
+</div>
+
+{% endblock %}
