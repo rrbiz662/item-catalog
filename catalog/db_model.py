@@ -15,15 +15,7 @@ class User(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
     email = Column(String(100), nullable=False)
-
-    @property
-    def serialize(self):
-        """Returns User info in JSON format."""
-        return{
-            "id": self.id,
-            "name": self.name,
-            "email": self.email,
-        }
+    picture = Column(String(250))
 
 
 class Category(Base):
@@ -51,7 +43,7 @@ class Item(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
     description = Column(String(250))
-    date_created = Column(DateTime(), default=datetime.datetime.now)
+    date_created = Column(DateTime(), default=datetime.date.today)
     category_id = Column(Integer, ForeignKey("category.id"))
     category = relationship(Category)
     user_id = Column(Integer, ForeignKey("user.id"))

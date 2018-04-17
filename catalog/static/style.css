@@ -1,3 +1,10 @@
+/*Elements*/
 body{
-    background-color: aquamarine;
+    background-color: red;
+}
+
+/*Classes*/
+.banner{
+    width: 100%;
+    background-color: burlywood;
 }
