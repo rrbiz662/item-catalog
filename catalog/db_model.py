@@ -3,7 +3,11 @@ from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
+from passlib.apps import custom_app_context as pwd_context
+from itsdangerous import(TimedJSONWebSignatureSerializer as serializer, BadSignature, SignatureExpired)
 import datetime
+import random
+import string
 
 Base = declarative_base()
 
@@ -16,6 +20,46 @@ class User(Base):
     name = Column(String(50), nullable=False)
     email = Column(String(100), nullable=False)
     picture = Column(String(250))
+    password_hash = Column(String(64))
+
+    def hash_password(self, password):
+        """Hashes user password."""
+        self.password_hash = pwd_context.encrypt(password)
+
+    def verify_password(self, password):
+        """Verifies password.
+        
+        Verifies password passed is the user's password. 
+        
+        Return: True if same password.         
+        """
+        return pwd_context.verify(password, self.password_hash)
+
+    def generate_auth_token(self, secret_key, expiration=600):
+        """Generates new token.
+        
+        Return: Token.
+        """
+        s = serializer(secret_key, expires_in=expiration)
+        return s.dumps({"id": self.id})
+
+    @staticmethod
+    def verify_auth_token(token, secret_key):
+        """Verifies token.
+        
+        Return: User's id if token is valid. 
+        """
+        s = serializer(secret_key)
+
+        try:
+            data = s.loads(token)
+        except SignatureExpired:
+            # Expired token.
+            return None
+        except BadSignature:
+            # Invalid token.
+            return None
+        return data["id"]
 
 
 class Category(Base):

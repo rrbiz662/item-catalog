@@ -1,0 +1,25 @@
+{% extends "index.html" %}
+{% block body %}
+<div>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+          <ul class=flashes>
+          {% for message in messages %}
+            <li>{{ message }}</li>
+          {% endfor %}
+          </ul>
+        {% endif %}
+      {% endwith %}
+    <h1>New User</h1>
+    <form class="form-signup" action="#" method="POST">
+            <label for="input-username" class="sr-only">Name</label>
+            <input type="text" name="input-username" class="form-control" placeholder="Username" required="" autofocus="" autocomplete="off">
+            <label for="input-email" class="sr-only">Email address</label>
+            <input type="email" name="input-email" class="form-control" placeholder="Email address" required="" autofocus="" autocomplete="off">
+            <label for="input-password" class="sr-only">Password</label>
+            <input type="password" name="input-password" class="form-control" placeholder="Password" required="" autocomplete="off">
+            <button class="btn btn-lg btn-primary mt-1" type="submit" name="create">Sign up</button>
+            <button class="btn btn-lg btn-primary mt-1" onclick="window.location.href={{url_for("show_login")}}">Cancel</button>
+    </form>
+</div>
+{% endblock %}

@@ -2,8 +2,9 @@
 from flask import Flask, render_template, request, redirect
 from flask import jsonify, url_for, flash, make_response
 from flask import session as login_session
+from flask_httpauth import HTTPBasicAuth
 from sqlalchemy import create_engine, asc
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, exc
 from db_model import Base, Category, Item, User
 import json
 import requests
@@ -12,9 +13,10 @@ import datetime
 import random
 import string
 import httplib2
+import pdb
 
 app = Flask(__name__)
-
+auth = HTTPBasicAuth()
 APPLICATION_NAME = "Catalog Application"
 
 # Connect to database and create database session.
@@ -23,15 +25,68 @@ Base.metadata.bind = engine
 dbSession = sessionmaker(bind=engine)
 session = dbSession()
 
+
 # Login/Logout methods.
 @app.route("/login/")
 def show_login():
-    # Create anti-forgery state token. 
-    state = "".join(random.choice(string.ascii_uppercase + string.digits)
-                    for x in xrange(32))
+        # Create anti-forgery state token. 
+        state = "".join(random.choice(string.ascii_uppercase + string.digits)
+                        for x in xrange(32))
 
-    login_session["state"] = state
-    return render_template("login.html", STATE=state)
+        login_session["state"] = state
+        return render_template("login.html", STATE=state)
+
+
+@app.route("/connect/", methods=["POST"])
+def local_connect():
+    # Get form data.
+    if "user" in request.form:
+        user_name = request.form["user"]
+    if "password" in request.form:
+        password = request.form["password"]
+
+    # Attempt to get user. 
+    try:
+        user = session.query(User).filter_by(name=user_name).one()
+    except exc.NoResultFound:
+        user = None
+
+    # Verify user and password. 
+    if user is not None and user.verify_password(password):
+        login_session["provider"] = "local"
+        login_session["username"] = user.name
+        login_session["email"] = user.email
+        login_session["picture"] = user.picture
+        login_session["user_id"] = user.id
+        login_session["access_token"] = user.generate_auth_token(login_session["state"])
+
+        return redirect(url_for("show_categories"))
+    elif user is not None and not user.verify_password(password):
+        flash("Invalid password.")
+        return render_template("login.html")
+    else:
+        flash("User does not exist. Please create account.")
+        return redirect(url_for("create_local_user"))
+
+
+@app.route("/disconnect/")
+def disconnect():
+    if "provider" in login_session:
+        if login_session["provider"] == "facebook":
+            fbdisconnect()
+            del login_session["facebook_id"]
+
+        del login_session["username"]
+        del login_session["email"]
+        del login_session["picture"]
+        del login_session["user_id"]
+        del login_session["provider"]
+        del login_session["access_token"]
+
+        return redirect(url_for("show_categories"))
+    else:
+        return redirect(url_for("show_categories"))
+
 
 @app.route("/fbconnect/", methods=["POST"])
 def fbconnect():
@@ -86,7 +141,7 @@ def fbconnect():
     # see if user exists
     user_id = get_user_id(login_session["email"])
     if not user_id:
-        user_id = create_user(login_session)
+        user_id = create_user()
     login_session["user_id"] = user_id
 
     output = ""
@@ -252,15 +307,35 @@ def delete_item(cat, item_name):
     else:
         return render_template("delete_item.html", item=item, category=category)
 
+@app.route("/catalog/user/new/", methods=["GET", "POST"])
+def create_local_user():    
+    if request.method == "POST":
+        if "create" in request.form:
+            login_session["provider"] = "local"
+            login_session["username"] = request.form["input-username"]
+            login_session["email"] = request.form["input-email"]
+            login_session["picture"] = None
+            user_id = create_user(request.form["input-password"])
+            user = session.query(User).filter_by(id=user_id).one()
+            login_session["user_id"] = user_id
+            login_session["access_token"] = user.generate_auth_token(login_session["state"])
+
+        return redirect(url_for("show_categories"))
+    else:
+        return render_template("new_user.html")
+
 
 # Helper methods. 
-def create_user(login_session):
-    newUser = User(name=login_session["username"], email=login_session[
-                   "email"], picture=login_session["picture"])
+def create_user(password=None):
+    newUser = User(name=login_session["username"],
+        email=login_session["email"], picture=login_session["picture"])
+
+    if login_session["provider"] == "local" and password is not None:
+        newUser.hash_password(password)
+
     session.add(newUser)
     session.commit()
-    user = session.query(User).filter_by(email=login_session["email"]).one()
-    return user.id
+    return newUser.id
 
 
 def get_user_info(user_id):
