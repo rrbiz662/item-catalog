@@ -2,12 +2,25 @@
 {% block body %}
 {% include "header.html" %}
 
-<div>
-        <h1>Delete "{{item.name}}" Category</h1>
-        <form action="{{url_for("delete_item", cat=category.category, item_name=item.name)}}" method="POST">
-            <button type="submit" name="delete">Delete</button>
-            <button type="submit" name="cancel">Cancel</button>
-        </form>
+<div class="row">
+        <div class="col-4"></div>
+        <div class="col-4">
+            <form action="{{url_for("delete_item", cat=category.category, item_name=item.name)}}" method="POST">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <h3 class="mb-3 font-weight-normal">Delete "{{item.name}}"</h3>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <button class="btn btn-sm btn-primary mt-1" type="submit" name="delete">Delete</button>
+                        <button class="btn btn-sm btn-primary mt-1" type="submit" name="cancel">Cancel</button>            
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-4"></div>
 </div>
 
 {% endblock %}

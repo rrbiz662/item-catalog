@@ -13,7 +13,7 @@ import datetime
 import random
 import string
 import httplib2
-import pdb
+
 
 app = Flask(__name__)
 auth = HTTPBasicAuth()
@@ -198,9 +198,11 @@ def show_categories():
 
 @app.route("/catalog/category/new", methods=["GET", "POST"])
 def create_category():
+    if "user_id" not in login_session:
+        return redirect(url_for("show_login"))
     if request.method == "POST":
         if "create" in request.form:
-            new_category = Category(category=request.form["category"], user_id="1")
+            new_category = Category(category=request.form["category"], user_id=login_session["user_id"])
             session.add(new_category)
             session.commit()
         return redirect(url_for("show_categories"))
@@ -210,6 +212,8 @@ def create_category():
 
 @app.route("/catalog/<string:cat>/edit/", methods=["GET", "POST"])
 def edit_category(cat):
+    if "user_id" not in login_session:
+        return redirect(url_for("show_login"))
     category = session.query(Category).filter_by(category=cat).one()
     if request.method == "POST":
         if "update" in request.form and "category" in request.form:
@@ -224,6 +228,8 @@ def edit_category(cat):
 
 @app.route("/catalog/<string:cat>/delete/", methods=["GET", "POST"])
 def delete_category(cat):
+    if "user_id" not in login_session:
+        return redirect(url_for("show_login"))
     category = session.query(Category).filter_by(category=cat).one()
     if request.method == "POST":
         if "delete" in request.form:
@@ -251,6 +257,8 @@ def show_item(cat, item_name):
 
 @app.route("/catalog/<string:cat>/new/", methods=["GET", "POST"])
 def create_item(cat):
+    if "user_id" not in login_session:
+        return redirect(url_for("show_login"))
     category = session.query(Category).filter_by(category=cat).one()
     categories = session.query(Category).all()
     if request.method == "POST":
@@ -263,7 +271,7 @@ def create_item(cat):
                 category = session.query(Category).filter_by(category=request.form["categories"]).one()
                 category_id = category.id
 
-            newItem = Item(name=name, description=description, category_id=category_id, user_id="1")
+            newItem = Item(name=name, description=description, category_id=category_id, user_id=login_session["user_id"])
             session.add(newItem)
             session.commit()
 
@@ -274,6 +282,8 @@ def create_item(cat):
 
 @app.route("/catalog/<string:cat>/<string:item_name>/edit/", methods=["GET", "POST"])
 def edit_item(cat, item_name):
+    if "user_id" not in login_session:
+        return redirect(url_for("show_login"))
     category = session.query(Category).filter_by(category=cat).one()
     item = session.query(Item).filter_by(name=item_name).one()
     categories = session.query(Category).all()
@@ -296,6 +306,8 @@ def edit_item(cat, item_name):
 
 @app.route("/catalog/<string:cat>/<string:item_name>/delete/", methods=["GET", "POST"])
 def delete_item(cat, item_name):
+    if "user_id" not in login_session:
+        return redirect(url_for("show_login"))
     category = session.query(Category).filter_by(category=cat).one()
     item = session.query(Item).filter_by(name=item_name).one()
     if request.method == "POST":
@@ -307,15 +319,16 @@ def delete_item(cat, item_name):
     else:
         return render_template("delete_item.html", item=item, category=category)
 
+
 @app.route("/catalog/user/new/", methods=["GET", "POST"])
 def create_local_user():    
     if request.method == "POST":
         if "create" in request.form:
             login_session["provider"] = "local"
-            login_session["username"] = request.form["input-username"]
-            login_session["email"] = request.form["input-email"]
+            login_session["username"] = request.form["username"]
+            login_session["email"] = request.form["email"]
             login_session["picture"] = None
-            user_id = create_user(request.form["input-password"])
+            user_id = create_user(request.form["password"])
             user = session.query(User).filter_by(id=user_id).one()
             login_session["user_id"] = user_id
             login_session["access_token"] = user.generate_auth_token(login_session["state"])
@@ -349,6 +362,11 @@ def get_user_id(email):
         return user.id
     except:
         return None
+
+
+@app.template_filter("datetime_formatter")
+def datetime_formatter(date, format="%b %d %Y"):
+    return date.strftime(format)
 
 
 if __name__ == "__main__":

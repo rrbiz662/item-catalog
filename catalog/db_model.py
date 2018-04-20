@@ -37,6 +37,8 @@ class User(Base):
 
     def generate_auth_token(self, secret_key, expiration=600):
         """Generates new token.
+
+        Expires in 10 minutes.
         
         Return: Token.
         """

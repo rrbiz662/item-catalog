@@ -1,12 +1,16 @@
 <div class="row banner">
         <div class="col-8">
-                <button class="mt-1 mb-1" onclick="window.location.href={{url_for("show_categories")}}">Home</button>
+                <button class="mt-1 mb-1 btn-sm btn-light" onclick="window.location.href={{url_for("show_categories")}}">Home</button>
         </div>
         <div class="col-4 text-right">
+                <!--Do not display login/logout buttons in the login/signup page.-->
+                {% if request.url_rule.endpoint != "show_login" and request.url_rule.endpoint != "create_local_user" %}
+                <!--Display login button when there is no user logged on.-->
                 {% if "username" not in session %}
-                <button class="mt-1 mb-1" onclick="window.location.href={{url_for("show_login")}}">Login</button>
+                <button class="mt-1 mb-1 btn-sm btn-light" onclick="window.location.href={{url_for("show_login")}}">Login</button>
                 {% else %}
-                <button class="mt-1 mb-1"onclick="window.location.href={{url_for("disconnect")}}">Logout</button>
+                <button class="mt-1 mb-1 btn-sm btn-light" onclick="window.location.href={{url_for("disconnect")}}">Logout</button>
+                {% endif %}
                 {% endif %}
         </div>
 </div>

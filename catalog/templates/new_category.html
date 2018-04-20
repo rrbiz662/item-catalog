@@ -2,14 +2,32 @@
 {% block body %}
 {% include "header.html" %}
 
-<div>
-    <h1>New Category</h1>
-    <form action="#" method="POST">
-        <label for="category">Name:</label>
-        <input type="text" maxlength="100" name="category">
-        <button type="submit" name="create">Create</button>
-        <button type="submit" name="cancel">Cancel</button>
-    </form>
+<div class="row">
+    <div class="col-4"></div>
+    <div class="col-4">
+        <!--Form to create a new category.-->
+        <form action="#" method="POST">
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h3 class="mb-3 font-weight-normal">New Category</h3>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <label for="category" class="sr-only">Category:</label>
+                    <input type="text" maxlength="100" name="category" class="form-control" placeholder="Category">
+                </div>
+            </div>
+            <hr>
+            <div class="row">
+                <div class="col-12 text-center">
+                        <button type="submit" name="create" class="btn btn-sm btn-primary mt-1">Create</button>
+                        <button type="submit" name="cancel" class="btn btn-sm btn-primary mt-1">Cancel</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col-4"></div>
 </div>
 
 {% endblock %}

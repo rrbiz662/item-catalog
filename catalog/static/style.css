@@ -1,10 +1,7 @@
 /*Elements*/
-body{
-    background-color: red;
-}
 
 /*Classes*/
 .banner{
     width: 100%;
-    background-color: burlywood;
+    background-color: rgb(132, 48, 158);
 }

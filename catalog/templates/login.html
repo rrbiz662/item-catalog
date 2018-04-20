@@ -1,23 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "index.html" %}
+{% block body %}
+{% include "header.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Login</title>
-</head>
-
-<body>
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-          <ul class=flashes>
-          {% for message in messages %}
-            <li>{{ message }}</li>
-          {% endfor %}
-          </ul>
-        {% endif %}
-      {% endwith %}
+<div>
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class=flashes>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endwith %}
     <!--Facebook login setup-->
     <script>
         window.fbAsyncInit = function () {
@@ -71,20 +65,34 @@
             });
         }
     </script>
-
-    <form class="form-signin" action="{{url_for("local_connect")}}" method="POST">
-        <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-        <label for="user" class="sr-only">Username</label>
-        <input type="text" name="user" class="form-control" placeholder="Username" required="" autofocus="" autocomplete="off">
-        <br>
-        <label for="password" class="sr-only">Password</label>
-        <input type="password" name="password" class="form-control" placeholder="Password" required="" autocomplete="off">
-        <br>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" >Sign in</button>
-        <fb:login-button scope="public_profile,email" onlogin="sendTokenToServer();">Login with Facebook</fb:login-button>
-        <br>
-        <a href="{{url_for("create_local_user")}}">Signup</a>
-    </form>
-</body>
-
-</html>
+    <div class="row">
+        <div class="col-4"></div>
+        <div class="col-4">
+            <!--Form for local login.-->
+            <form action="{{url_for("local_connect")}}" method="POST">
+                <h1 class="h3 mb-3 font-weight-normal">Please sign in...</h1>
+                <label for="user" class="sr-only">Username</label>
+                <input type="text" name="user" class="form-control" placeholder="Username" required="" autofocus="" autocomplete="off">
+                <br>
+                <label for="password" class="sr-only">Password</label>
+                <input type="password" name="password" class="form-control" placeholder="Password" required="" autocomplete="off">
+                <div class="row">
+                    <div class="col-6">
+                        <button class="btn btn-primary btn-sm mt-1" type="submit">Sign in</button>
+                    </div>
+                    <div class="col-6 text-right">
+                        <fb:login-button class="mt-1" size="medium" scope="public_profile,email" onlogin="sendTokenToServer();">Login with Facebook</fb:login-button>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <a href="{{url_for("create_local_user")}}">Signup</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="col-4"></div>
+    </div>
+</div>
+{% endblock %}
