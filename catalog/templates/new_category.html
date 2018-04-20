@@ -15,14 +15,14 @@
             <div class="row">
                 <div class="col-12">
                     <label for="category" class="sr-only">Category:</label>
-                    <input type="text" maxlength="100" name="category" class="form-control" placeholder="Category">
+                    <input type="text" maxlength="100" name="category" class="form-control" placeholder="Category" required="">
                 </div>
             </div>
             <hr>
             <div class="row">
                 <div class="col-12 text-center">
-                        <button type="submit" name="create" class="btn btn-sm btn-primary mt-1">Create</button>
-                        <button type="submit" name="cancel" class="btn btn-sm btn-primary mt-1">Cancel</button>
+                        <button name="create" class="btn btn-sm btn-primary" type="submit">Create</button>
+                        <button name="cancel" class="btn btn-sm btn-primary" onclick="window.history.back()">Cancel</button>
                 </div>
             </div>
         </form>

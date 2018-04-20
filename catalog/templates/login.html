@@ -33,35 +33,28 @@
             fjs.parentNode.insertBefore(js, fjs);
         }(document, "script", "facebook-jssdk"));
         
-        // Send token to the server. 
         function sendTokenToServer() {
-            // Get token. 
+            // Get user access token. 
             var access_token = FB.getAuthResponse()["accessToken"];
-            // Dont need.
-            console.log(access_token)
-            console.log("Welcome!  Fetching your information.... ");
-            FB.api("/me", function (response) {
-                console.log('Successful login for: ' + response.name);
-                // Send token to the server. 
-                $.ajax({
-                    type: "POST",
-                    url: "/fbconnect?state={{STATE}}",
-                    processData: false,
-                    data: access_token,
-                    contentType: "application/octet-stream; charset=utf-8",
-                    success: function (result) {
-                        // Handle or verify the server response if necessary.
-                        if (result) {
-                            $("#result").html("Login Successful!</br>" + result + "</br>Redirecting...")
-                            setTimeout(function () {
-                                window.location.href = "/catalog";
-                            }, 4000);
-                        }
-                        else {
-                            $("#result").html("Failed to make a server-side call. Check your configuration and console.");
-                        }
+            // Send token to the server. 
+            $.ajax({
+                type: "POST",
+                url: "/fbconnect?state={{STATE}}",
+                processData: false,
+                data: access_token,
+                contentType: "application/octet-stream; charset=utf-8",
+                success: function (result) {
+                    // Handle or verify the server response if necessary.
+                    if (result) {
+                        $("#result").html("Login Successful!</br>" + result + "</br>Redirecting...")
+                        setTimeout(function () {
+                            window.location.href = "/catalog";
+                        }, 4000);
                     }
-                });
+                    else {
+                        $("#result").html("Failed to make a server-side call. Check your configuration and console.");
+                    }
+                }
             });
         }
     </script>
@@ -95,4 +88,5 @@
         <div class="col-4"></div>
     </div>
 </div>
+
 {% endblock %}

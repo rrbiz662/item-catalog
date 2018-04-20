@@ -2,6 +2,15 @@
 {% block body %}
 {% include "header.html" %}
 
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class=flashes>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endwith %}
 <!--List categories.-->
 <div>
     <h2>Categories</h2>
@@ -10,6 +19,7 @@
         <li class="list-group-item">
             <a href="{{url_for("show_items", cat=cat.category)}}">{{cat.category}}</a>
             <br>
+            <!--Only display edit/delete links to registered users.-->
             {% if "user_id" in session %}
             <a href="{{url_for("edit_category", cat=cat.category)}}">Edit</a>
             |

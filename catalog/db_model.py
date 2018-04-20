@@ -1,10 +1,11 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 from sqlalchemy import create_engine
 from passlib.apps import custom_app_context as pwd_context
-from itsdangerous import(TimedJSONWebSignatureSerializer as serializer, BadSignature, SignatureExpired)
+from itsdangerous import TimedJSONWebSignatureSerializer as serializer
+from itsdangerous import BadSignature, SignatureExpired
 import datetime
 import random
 import string
@@ -23,33 +24,49 @@ class User(Base):
     password_hash = Column(String(64))
 
     def hash_password(self, password):
-        """Hashes user password."""
+        """Hashes user password.
+
+        Args:
+            password: The password to hash.
+        """
         self.password_hash = pwd_context.encrypt(password)
 
     def verify_password(self, password):
-        """Verifies password.
-        
-        Verifies password passed is the user's password. 
-        
-        Return: True if same password.         
+        """Verifies user password.
+
+        Verifies the password passed in matches the user's password.
+
+        Args:
+            password: The password to check.
+
+        Return:
+            True if the password are the same.
         """
         return pwd_context.verify(password, self.password_hash)
 
     def generate_auth_token(self, secret_key, expiration=600):
-        """Generates new token.
+        """Generates a new token.
 
-        Expires in 10 minutes.
-        
-        Return: Token.
+        Args:
+            secret_key: The key to use to create the new token.
+            expiration: The duration the token will be valid for.
+
+        Return:
+            A token.
         """
         s = serializer(secret_key, expires_in=expiration)
         return s.dumps({"id": self.id})
 
     @staticmethod
     def verify_auth_token(token, secret_key):
-        """Verifies token.
-        
-        Return: User's id if token is valid. 
+        """Verifies a token.
+
+        Args:
+            token: The token to verify.
+            secret_key: The key to use to verify the token.
+
+        Return:
+            The user's id if the token is valid.
         """
         s = serializer(secret_key)
 
@@ -105,6 +122,7 @@ class Item(Base):
             "date": self.date_created,
             "category_id": self.category_id,
         }
+
 
 # Connect to the database.
 engine = create_engine("sqlite:///catalog.db")

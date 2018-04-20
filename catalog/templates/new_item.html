@@ -5,6 +5,7 @@
 <div class="row">
     <div class="col-4"></div>
     <div class="col-4">
+        <!--Form to create new items.-->
         <form action="#" method="POST">
             <div class="row">
                 <div class="col-12 text-center">
@@ -14,7 +15,7 @@
             <div class="row">
                 <div class="col-12">
                     <label class="sr-only" for="name">Item:</label>
-                    <input class="form-control" type="text" maxlength="100" name="name" placeholder="Item">
+                    <input class="form-control" type="text" maxlength="100" name="name" placeholder="Item" required="">  
                 </div>
             </div>
             <br>
@@ -26,8 +27,9 @@
             </div>
             <div class="row">
                 <div class="col-12">
+                    <!--List available categories.-->
                     <label for="categories">Categories:</label>
-                    <select class="form-control" name="categories" multiple>
+                    <select class="form-control" name="categories" multiple required="">
                         {% for cat in categories %}
                         <option value="{{cat.category}}">{{cat.category}}</option>
                         {% endfor %}
@@ -37,8 +39,8 @@
             <hr>
             <div class="row">
                 <div class="col-12 text-center">
-                    <button class="btn btn-sm btn-primary mt-1" type="submit" name="create">Create</button>
-                    <button class="btn btn-sm btn-primary mt-1" type="submit" name="cancel">Cancel</button>
+                    <button class="btn btn-sm btn-primary" type="submit" name="create">Create</button>
+                    <button class="btn btn-sm btn-primary" name="cancel" onclick="window.history.back()">Cancel</button>
                 </div>
             </div> 
         </form>
