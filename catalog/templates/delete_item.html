@@ -6,7 +6,7 @@
         <div class="col-4"></div>
         <div class="col-4">
             <!--Form to delete an item.-->
-            <form action="{{url_for("delete_item", cat=category.category, item_name=item.name)}}" method="POST">
+            <form action="{{url_for("delete_item", category_name=category.category, item_name=item.name)}}" method="POST">
                 <div class="row">
                     <div class="col-12 text-center">
                         <h3 class="mb-3 font-weight-normal">Delete "{{item.name}}"</h3>

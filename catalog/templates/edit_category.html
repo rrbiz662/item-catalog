@@ -6,7 +6,7 @@
     <div class="col-4"></div>
     <div class="col-4">
         <!--Form to edit a category.-->
-        <form action="{{url_for("edit_category", cat=category.category)}}" method="POST">
+        <form action="{{url_for("edit_category", category_name=category.category)}}" method="POST">
             <div class="row">
                 <div class="col-12 text-center">
                     <h3 class="mb-3 font-weight-normal">Edit "{{category.category}}" Category</h3>

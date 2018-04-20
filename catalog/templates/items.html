@@ -2,19 +2,29 @@
 {% block body%}
 {% include "header.html" %}
 
+<!--Display flash messages.-->
+{% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class=flashes>
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endwith %}
 <!--List items.-->
 <div>
     <h2>Items</h2>
     <ul class="list-group">
         {% for i in items %}
         <li class="list-group-item">
-            <a href="{{url_for("show_item", cat=category.category, item_name=i.name)}}">{{i.name}}</a>
+            <a href="{{url_for("show_item", category_name=category.category, item_name=i.name)}}">{{i.name}}</a>
             <br>
             <!--Only display edit/delete links to registered users.-->
             {% if "user_id" in session %}
-            <a href="{{url_for("edit_item", cat=category.category, item_name=i.name)}}">Edit</a>
+            <a href="{{url_for("edit_item", category_name=category.category, item_name=i.name)}}">Edit</a>
             |
-            <a href="{{url_for("delete_item", cat=category.category, item_name=i.name)}}">Delete</a>
+            <a href="{{url_for("delete_item", category_name=category.category, item_name=i.name)}}">Delete</a>
             {% endif %}
         </li>
         {% endfor %}
@@ -22,7 +32,7 @@
 </div>
 {% if "user_id" in session %}
 <div>
-    <a href="{{url_for("create_item", cat=category.category)}}">Create Item</a>
+    <a href="{{url_for("create_item", category_name=category.category)}}">Create Item</a>
 </div>
 {% endif %}
 

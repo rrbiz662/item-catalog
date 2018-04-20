@@ -158,15 +158,15 @@ def fbdisconnect():
 
 
 # JSON APIs to view catalog info.
-@app.route("/catalog/<string:cat>/<string:item_name>/JSON/")
-def item_JSON(cat, item_name):
+@app.route("/catalog/<string:category_name>/<string:item_name>/JSON/")
+def item_JSON(category_name, item_name):
     item = session.query(Item).filter_by(name=item_name).one()
     return jsonify(item=item.serialize)
 
 
-@app.route("/catalog/<string:cat>/JSON/")
-def category_items_JSON(cat):
-    category = session.query(Category).filter_by(category=cat).one()
+@app.route("/catalog/<string:category_name>/JSON/")
+def category_items_JSON(category_name):
+    category = session.query(Category).filter_by(category=category_name).one()
     items = session.query(Item).filter_by(category_id=category.id)
     return jsonify(items=[i.serialize for i in items])
 
@@ -194,144 +194,168 @@ def create_category():
         return redirect(url_for("disconnect"))
 
     if request.method == "POST":
-        new_category = Category(category=request.form["category"], user_id=login_session["user_id"])
-        session.add(new_category)
-        session.commit()
+        if "create" in request.form:
+            new_category = Category(category=request.form["category"], user_id=login_session["user_id"])
+            session.add(new_category)
+            session.commit()
+
         return redirect(url_for("show_categories"))
     else:
         return render_template("new_category.html")
 
 
-@app.route("/catalog/<string:cat>/edit/", methods=["GET", "POST"])
-def edit_category(cat):
+@app.route("/catalog/<string:category_name>/edit/", methods=["GET", "POST"])
+def edit_category(category_name):
     if "user_id" not in login_session:
         return redirect(url_for("show_login"))
 
     if not is_valid_token(login_session["provider"]):
         return redirect(url_for("disconnect"))
 
-    category = session.query(Category).filter_by(category=cat).one()
+    category = session.query(Category).filter_by(category=category_name).one()
     if request.method == "POST":
-        category.category = request.form["category"]
-        session.add(category)
-        session.commit()       
+        if "update" in request.form:
+            category.category = request.form["category"]
+            session.add(category)
+            session.commit()       
 
         return redirect(url_for("show_categories"))
     else:
-        return render_template("edit_category.html", category=category)
+        if login_session["user_id"] != category.user_id:
+            flash("Insufficent privileges.")
+            return redirect(url_for("show_categories"))
+        else:
+            return render_template("edit_category.html", category=category)
 
 
-@app.route("/catalog/<string:cat>/delete/", methods=["GET", "POST"])
-def delete_category(cat):
+@app.route("/catalog/<string:category_name>/delete/", methods=["GET", "POST"])
+def delete_category(category_name):
     if "user_id" not in login_session:
         return redirect(url_for("show_login"))
 
     if not is_valid_token(login_session["provider"]):
         return redirect(url_for("disconnect"))
 
-    category = session.query(Category).filter_by(category=cat).one()
+    category = session.query(Category).filter_by(category=category_name).one()
     if request.method == "POST":
-        session.delete(category)
-        session.commit()
+        if "delete" in request.form:
+            session.delete(category)
+            session.commit()
 
         return redirect(url_for("show_categories"))
     else:
-        return render_template("delete_category.html", category=category)
+        if login_session["user_id"] != category.user_id:
+            flash("Insufficent privileges.")
+            return redirect(url_for("show_categories"))
+        else:
+            return render_template("delete_category.html", category=category)
 
 
-@app.route("/catalog/<string:cat>/")
-def show_items(cat):
-    category = session.query(Category).filter_by(category=cat).one()
+@app.route("/catalog/<string:category_name>/")
+def show_items(category_name):
+    category = session.query(Category).filter_by(category=category_name).one()
     items = session.query(Item).filter_by(category_id=category.id).order_by(asc(Item.name)).all()
     return render_template("items.html", items=items, category=category)
 
 
-@app.route("/catalog/<string:cat>/<string:item_name>/")
-def show_item(cat, item_name):
-    category= session.query(Category).filter_by(category=cat).one()
+@app.route("/catalog/<string:category_name>/<string:item_name>/")
+def show_item(category_name, item_name):
+    category= session.query(Category).filter_by(category=category_name).one()
     item = session.query(Item).filter_by(name=item_name).one()
     return render_template("item.html", category=category, item=item)
 
 
-@app.route("/catalog/<string:cat>/new/", methods=["GET", "POST"])
-def create_item(cat):
+@app.route("/catalog/<string:category_name>/new/", methods=["GET", "POST"])
+def create_item(category_name):
     if "user_id" not in login_session:
         return redirect(url_for("show_login"))
 
     if not is_valid_token(login_session["provider"]):
         return redirect(url_for("disconnect"))
 
-    category = session.query(Category).filter_by(category=cat).one()
+    category = session.query(Category).filter_by(category=category_name).one()
     categories = session.query(Category).all()
     if request.method == "POST":
-        name = request.form["name"]            
-        description = request.form["description"]
-        category = session.query(Category).filter_by(category=request.form["categories"]).one()
-        category_id = category.id
+        if "create" in request.form:
+            name = request.form["name"]            
+            description = request.form["description"]
+            category = session.query(Category).filter_by(category=request.form["categories"]).one()
+            category_id = category.id
 
-        newItem = Item(name=name, description=description, category_id=category_id, user_id=login_session["user_id"])
-        session.add(newItem)
-        session.commit()
+            newItem = Item(name=name, description=description, category_id=category_id, user_id=login_session["user_id"])
+            session.add(newItem)
+            session.commit()
 
-        return redirect(url_for("show_items", cat=cat))
+        return redirect(url_for("show_items", category_name=category_name))
     else:
-        return render_template("new_item.html", cat=cat, categories=categories)
+        return render_template("new_item.html", category_name=category_name, categories=categories)
 
 
-@app.route("/catalog/<string:cat>/<string:item_name>/edit/", methods=["GET", "POST"])
-def edit_item(cat, item_name):
+@app.route("/catalog/<string:category_name>/<string:item_name>/edit/", methods=["GET", "POST"])
+def edit_item(category_name, item_name):
     if "user_id" not in login_session:
         return redirect(url_for("show_login"))
 
     if not is_valid_token(login_session["provider"]):
         return redirect(url_for("disconnect"))
 
-    category = session.query(Category).filter_by(category=cat).one()
+    category = session.query(Category).filter_by(category=category_name).one()
     item = session.query(Item).filter_by(name=item_name).one()
     categories = session.query(Category).all()
     if request.method == "POST":
-        item.name = request.form["name"]
-        item.description = request.form["description"]
-        category = session.query(Category).filter_by(category=request.form["categories"]).one()
-        item.category_id = category.id
-        session.add(item)
-        session.commit()
+        if "update" in request.form:
+            item.name = request.form["name"]
+            item.description = request.form["description"]
+            category = session.query(Category).filter_by(category=request.form["categories"]).one()
+            item.category_id = category.id
+            session.add(item)
+            session.commit()
 
-        return redirect(url_for("show_items", cat=cat))
+        return redirect(url_for("show_items", category_name=category_name))
     else:
-        return render_template("edit_item.html", item=item, categories=categories, category=category)
+        if login_session["user_id"] != item.user_id:
+            flash("Insufficent privileges.")
+            return redirect(url_for("show_items", category_name=category_name))
+        else:
+            return render_template("edit_item.html", item=item, categories=categories, category=category)
 
 
-@app.route("/catalog/<string:cat>/<string:item_name>/delete/", methods=["GET", "POST"])
-def delete_item(cat, item_name):
+@app.route("/catalog/<string:category_name>/<string:item_name>/delete/", methods=["GET", "POST"])
+def delete_item(category_name, item_name):
     if "user_id" not in login_session:
         return redirect(url_for("show_login"))
 
     if not is_valid_token(login_session["provider"]):
         return redirect(url_for("disconnect"))
 
-    category = session.query(Category).filter_by(category=cat).one()
+    category = session.query(Category).filter_by(category=category_name).one()
     item = session.query(Item).filter_by(name=item_name).one()
     if request.method == "POST":
-        session.delete(item)
-        session.commit()
+        if "delete" in request.form:
+            session.delete(item)
+            session.commit()
 
-        return redirect(url_for("show_items", cat=cat))
+        return redirect(url_for("show_items", category_name=category_name))
     else:
-        return render_template("delete_item.html", item=item, category=category)
+        if login_session["user_id"] != item.user_id:
+            flash("Insufficent privileges.")
+            return redirect(url_for("show_items", category_name=category_name))
+        else:
+            return render_template("delete_item.html", item=item, category=category)
 
 
 @app.route("/catalog/user/new/", methods=["GET", "POST"])
 def create_local_user():    
     if request.method == "POST":
-        login_session["provider"] = "local"
-        login_session["username"] = request.form["username"]
-        login_session["email"] = request.form["email"]
-        login_session["picture"] = None
-        user_id = create_user(request.form["password"])
-        user = session.query(User).filter_by(id=user_id).one()
-        login_session["user_id"] = user_id
-        login_session["access_token"] = user.generate_auth_token(login_session["state"])
+        if "create" in request.form:
+            login_session["provider"] = "local"
+            login_session["username"] = request.form["username"]
+            login_session["email"] = request.form["email"]
+            login_session["picture"] = None
+            user_id = create_user(request.form["password"])
+            user = session.query(User).filter_by(id=user_id).one()
+            login_session["user_id"] = user_id
+            login_session["access_token"] = user.generate_auth_token(login_session["state"])
 
         return redirect(url_for("show_categories"))
     else:
