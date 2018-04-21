@@ -315,7 +315,7 @@ def create_item(category_name):
         return redirect(url_for("disconnect"))
 
     category = session.query(Category).filter_by(category=category_name).one()
-    categories = session.query(Category).all()
+    categories = session.query(Category).order_by(asc(Category.category)).all()
     if request.method == "POST":
         # Create new item and update database.
         if "create" in request.form:
@@ -351,7 +351,7 @@ def edit_item(category_name, item_name):
 
     category = session.query(Category).filter_by(category=category_name).one()
     item = session.query(Item).filter_by(name=item_name).one()
-    categories = session.query(Category).all()
+    categories = session.query(Category).order_by(asc(Category.category)).all()
     if request.method == "POST":
         # Update item and database.
         if "update" in request.form:
