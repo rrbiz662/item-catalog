@@ -20,7 +20,7 @@ To get a copy of the project to work on locally, the user can either `download t
 ### Initial Setup
 In order for the python script to run correctly, the `catalog` database must be created. To create the database:
 1) Open Terminal/Powershell.
-2) Using the `cd` command, navigate to the directory where the project is located.
+2) Using the `cd` command, navigate to the directory where the project `Vagrantfile` is located.
 3) Start the VM by using the `vagrant up` command.
 4) Connect to the VM using the `vagrant ssh` command.
 5) Navigate to the directory in the VM where the `games.py` script is located using the command `cd`.
@@ -29,7 +29,7 @@ In order for the python script to run correctly, the `catalog` database must be 
 ## Run the Project
 In order to run the project:
 1) Open Terminal/Powershell.
-2) Using the `cd` command, navigate to the directory where the project is located.
+2) Using the `cd` command, navigate to the directory where the project `Vagrantfile` is located.
 3) Start the VM by using the command `vagrant up`.
 4) Connect to the VM using the command `vagrant ssh`.
 5) Navigate to the directory in the VM where the python script is located using the command `cd`.
