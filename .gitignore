@@ -1,3 +1,4 @@
 
 *.pyc
 catalog/catalog.db
+Vagrantfile
