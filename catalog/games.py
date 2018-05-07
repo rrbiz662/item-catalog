@@ -7,7 +7,7 @@ from passlib.apps import custom_app_context as pwd_context
 
 
 # Setup database.
-engine = create_engine("postgresql://catalog:!@#$qwer@localhost/catalog")
+engine = create_engine("postgresql://catalog:password@localhost/catalog")
 Base.metadata.bind = engine
 dbSession = sessionmaker(bind=engine)
 session = dbSession()

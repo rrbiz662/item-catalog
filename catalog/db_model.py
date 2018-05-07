@@ -125,6 +125,6 @@ class Item(Base):
 
 
 # Connect to the database.
-engine = create_engine("postgresql://catalog:!@#$qwer@localhost/catalog")
+engine = create_engine("postgresql://catalog:password@localhost/catalog")
 # Create tables if they don't already exist.
 Base.metadata.create_all(engine)
