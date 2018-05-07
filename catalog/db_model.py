@@ -21,7 +21,7 @@ class User(Base):
     name = Column(String(50), nullable=False)
     email = Column(String(100), nullable=False)
     picture = Column(String(250))
-    password_hash = Column(String(65))
+    password_hash = Column(String(128))
 
     def hash_password(self, password):
         """Hashes user password.
@@ -105,7 +105,7 @@ class Item(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
-    description = Column(String(250))
+    description = Column(String(500))
     date_created = Column(DateTime(), default=datetime.date.today)
     category_id = Column(Integer, ForeignKey("category.id"))
     category = relationship(Category)
