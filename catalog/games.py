@@ -6,8 +6,8 @@ import datetime
 from passlib.apps import custom_app_context as pwd_context
 
 
-# Setup database. 
-engine = create_engine("sqlite:///catalog.db")
+# Setup database.
+engine = create_engine("postgresql://catalog:!@#$qwer@localhost/catalog")
 Base.metadata.bind = engine
 dbSession = sessionmaker(bind=engine)
 session = dbSession()
