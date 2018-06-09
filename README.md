@@ -1,4 +1,4 @@
-# item-catalog-project
+# item-catalog
 This application is a `Catalog Application` that allows users to catalog items based on categories. The application demonstrates: `API endpoints`, `CRUD` operations on the database via `SQLAlchemy`, `local authentication/authorization` via `ItsDangerous` and `PassLib`, and `third party authentication/authorization` via `Facebook's Graph API`. Additionally, `Bootstrap` is used for the styling of the application. 
 
 For testing purposes the `catalog` database is populated with `video game` data. This data consists of `video game categories` as the `categories` and `video games` as the `items` themselves.  
